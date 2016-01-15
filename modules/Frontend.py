@@ -5,7 +5,7 @@ import sys
 from PyQt5 import QtWidgets, uic
 from threading import Thread
 from time import sleep
-import lib.icon_rc as icon_rc
+import libraries.icon_rc as icon_rc
 
 
 class Frontend(QtWidgets.QMainWindow):

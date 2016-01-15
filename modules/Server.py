@@ -2,7 +2,7 @@ __author__ = 'Timo Boldt'
 __version__ = '1.0.0'
 
 import time
-import lib.Zlib as Zlib
+import libraries.Zlib as Zlib
 
 
 class Server:

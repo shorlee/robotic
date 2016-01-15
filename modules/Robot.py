@@ -34,7 +34,7 @@ __date__ = "2016/01/14"
 #----------------------------------------#
 
 ##########################################
-from lib.leg import Leg
+from libraries.leg import Leg
 import math
 import numpy as np
 from time import sleep

@@ -2,8 +2,8 @@ from threading import Thread, Event
 
 import argparse
 import importlib
-import lib.Config as Config
-import lib.Logger as Logger
+import libraries.Config as Config
+import libraries.Logger as Logger
 from time import sleep
 import sys
 
