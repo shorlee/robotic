@@ -24,6 +24,13 @@ class Rob:
                 servo = False,
                 speed = 10,
                 phys = (0.042, 0.038, 0.049, 0.059, 0.021, 0.004, 0.097),
+                servos = ([
+                    dict(
+                            index = 1,
+                            ccw = False,
+                            angle = 0,
+                            speed = 10,
+                            offset = 0
                     ),
                     dict(
                             index = 3,
