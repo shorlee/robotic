@@ -251,7 +251,7 @@ class Rob:
     # Funktionen Asmus
     #"2" in jeder liste wurde durch "1" ersetzt
     # Funktion Dreieckgang
-    def gangDreieck(ausgangshoehe, schritthoehe, verschiebungX):
+    def moveTriangle(ausgangshoehe, schritthoehe, verschiebungX):
         xHalb = verschiebungX / 2
         listeDreieck = [[0, 0, ausgangshoehe, 1], [-xHalb, 0, ausgangshoehe, 0], [0, 0, schritthoehe, 2],
                         [xHalb, 0, ausgangshoehe, 0]]
@@ -289,6 +289,12 @@ class Rob:
     # Funktion zum drehen der gesammten workList
     def drehenFunktion(self):
         listeRotiert = []
+        self.Tmatrix = np.array([
+            [math.cos(self.phi), -math.sin(self.phi), 0, 0],
+            [math.sin(self.phi), math.cos(self.phi), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+            ])
         for i in self.workList:
             vektor = np.array(i)
             transformiert = np.dot(self.Tmatrix, vektor)
@@ -310,17 +316,32 @@ class Rob:
     dreickeListe = gangDreieck(ausgangshoeheZ, hoeheZ, verschiebungX)
     # initialList = dreickeListe
 
+    """
     # Koordinaten der Ausgangsposition der Fuesse aus Basiskoordinatensystem
     # OHNE VORZEICHEN
     radius = 0.18
     fuss1245X = radius * math.cos(math.pi / 6)  # 0.13 - 0.18
-    fuss1245Y = radius * math.sin(math.pi / 6)  # 0.11 - 0.1
+    fuss1245Y = radius * math.sin(math.pi / 6)  # 0.11 - 0.10
     fuss36X = 0
-    fuss36Y = radius * math.sin(math.pi / 3)  # 0.16 - 0.2
+    fuss36Y = radius * math.sin(math.pi / 3)  # 0.16 - 0.20
 
     # Liste der Ausgangspositionen der Fuesse mit vorzeichen
     initialPosFuesse = [[fuss1245X, -fuss1245Y, 0, 0], [fuss1245X, fuss1245Y, 0, 0], [fuss36X, fuss36Y, 0, 0],
                         [-fuss1245X, fuss1245Y, 0, 0], [-fuss1245X, -fuss1245Y, 0, 0], [fuss36X, -fuss36Y, 0, 0]]
+    """
+    ######
+    # TODO: integrate me
+    def generatePos(self, radius):
+        xLeg1245 = radius * math.cos(math.pi / 6)  # 0.13 - 0.18
+        yLeg1245 = radius * math.sin(math.pi / 6)  # 0.11 - 0.10
+        xLeg36 = 0
+        yLeg36 = radius * math.sin(math.pi / 3)  # 0.16 - 0.20
+        return [[xLeg1245, -yLeg1245, 0, 0], [xLeg1245, yLeg1245, 0, 0], [xLeg36, yLeg36, 0, 0],
+                            [-xLeg1245, yLeg1245, 0, 0], [-xLeg1245, -yLeg1245, 0, 0], [xLeg36, -yLeg36, 0, 0]]
+
+    initSmallPos = generatePos(0.18)
+    initWidePos = generatePos(0.22)
+    ######
 
     # Liste fuer korrospondierende Beine:
     # korrospndLeg = korrospondLeg = [[0,2,4],[1,3,5]]
@@ -364,15 +385,24 @@ class Rob:
         for i in self.legDicts:
             self.legObjs.append(Leg(i))
         # Koordinaten zur Verschiebung
-        self.verschiebungX = 0.00
-        self.hoeheZ = -0.14
-        self.ausgangshoeheZ = -0.16
+        #self.verschiebungX = 0.00
+        self.stepWidth=0.00
+        #self.hoeheZ = -0.14
+        self.stepHeight=0.00
+        self.stepHeightNormal=-0.14
+        self.stepHeightHigh=-0.14
+        #self.ausgangshoeheZ = -0.16
+        self.bodyHeight=0.00
+        self.bodyHeightNormal=-0.16
+        self.bodyHeightHigh=-0.16
         # Rotationswinkel
-        self.phi = 0.0
+        #self.phi = 0.0
+        self.turnAngle=0.0
         # Geschwindigkeit
         self.speed = 10
         # Gangart
-        self.wahlGangart = 0
+        #self.wahlGangart = 0
+        self.moveType=0
         # Beine Startposition anfahren lassen
         for i in range(0, 6):
             self.setLeg(i, [self.initialPosFuesse[i][0], self.initialPosFuesse[i][1], self.initialPosFuesse[i][2], 1],
@@ -447,6 +477,7 @@ class Rob:
                 position -= 1
             sortList[position]["value"] = temp
 
+    # TODO: switch-case me
     # Funktionen zum errechnen der Werte aus Data von Controller
     # Aus strings Werte von 0 bis 3 fuer Gangart
     def gangArt(self):
@@ -471,9 +502,7 @@ class Rob:
     # Schrittweite errechnen
     # Werte zwischen 0 und 1
     def schrittweite(self):
-        maximalWert = 0.1
-        # y und x in dict vertauschen
-        print("Data y ", self.data["axis"]["y"])
+        maximalWert = 0.08
         verschiebungWert = self.data["axis"]["y"]
         if verschiebungWert < 0.1:
             verschiebungWert = 0.00
@@ -489,6 +518,7 @@ class Rob:
         else:
             self.phi = 0.0
 
+    # TODO: delete me
     # Standhoehe veraendern
     # hoch/runter = bool
     def standHoehe(self, hoch, runter):
@@ -501,12 +531,13 @@ class Rob:
     # Schritthoehe veraendern
     def schrittHoehe(self):
         if self.data["ctrl"]["height"]:
-            self.hoeheZ = self.verschiebungSchritthoehe
-            self.ausgangshoeheZ = self.verschiebungKoerper
+            self.bodyHeight = self.bodyHeightHigh
+            self.stepHeight = self.stepHeightHigh
         else:
-            self.hoeheZ = -0.14
-            self.ausgangshoeheZ = -0.16
+            self.bodyHeight = self.bodyHeightNormal
+            self.stepHeight = self.stepHeightNormal
 
+    # TODO: extract me
     # Dicts abgleichen
     def dictAbgleich(self):
         self.geschwindigkeit()
@@ -545,22 +576,20 @@ class Rob:
             self.geschwindigkeit()
 
             # Verschiedene Gangarten
-            if self.workList[self.index1][3] == 1 and self.workList[self.index2][3] == 2:
+            if self.workList[self.index1][3] == 1 and self.workList[self.index1][3] == 1:
                 self.dictAbgleich()
+                #Wert des Index1 in workliste voraenderung
+                point=self.workList[self.index1][3]
                 self.workList = copy.deepcopy(
                         self.listeGangartenfunktionen[self.wahlGangart](self.ausgangshoeheZ, self.hoeheZ,
                                                                         self.verschiebungX))
                 self.index1 = 0
                 self.index2 = int(len(self.workList) / 2)
+                if point==2:
+                    self.index1,self.index2 = self.index2,self.index1
                 self.indexRange = len(self.workList)
                 # Drehung
                 if self.phi != 0.0:
-                    self.Tmatrix = np.array([
-                        [math.cos(self.phi), -math.sin(self.phi), 0, 0],
-                        [math.sin(self.phi), math.cos(self.phi), 0, 0],
-                        [0, 0, 1, 0],
-                        [0, 0, 0, 1]
-                    ])
                     self.workList = copy.deepcopy(self.drehenFunktion())
 
             # Erstes Trippel der Beine
