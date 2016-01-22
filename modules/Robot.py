@@ -17,9 +17,6 @@ __date__ = "2016/01/22"
 
 
 class Rob:
-    ########################
-    #michel:)
-    #######################
     legDicts = ([
         # Leg 1
         dict(
@@ -252,10 +249,11 @@ class Rob:
     ])
 
     # Funktionen Asmus
+    #"2" in jeder liste wurde durch "1" ersetzt
     # Funktion Dreieckgang
     def gangDreieck(ausgangshoehe, schritthoehe, verschiebungX):
         xHalb = verschiebungX / 2
-        listeDreieck = [[0, 0, ausgangshoehe, 1], [-xHalb, 0, ausgangshoehe, 0], [0, 0, schritthoehe, 2],
+        listeDreieck = [[0, 0, ausgangshoehe, 1], [-xHalb, 0, ausgangshoehe, 0], [0, 0, schritthoehe, 1],
                         [xHalb, 0, ausgangshoehe, 0]]
         return (listeDreieck)
 
@@ -263,7 +261,7 @@ class Rob:
     def gangRechteck(ausgangshoehe, schritthoehe, verschiebungX):
         xHalb = verschiebungX / 2
         listeRechteck = [[0, 0, ausgangshoehe, 1], [-xHalb, 0, ausgangshoehe, 0], [-xHalb, 0, ausgangshoehe, 0],
-                         [-xHalb, 0, schritthoehe, 0], [0, 0, schritthoehe, 2], [xHalb, 0, schritthoehe, 0],
+                         [-xHalb, 0, schritthoehe, 0], [0, 0, schritthoehe, 1], [xHalb, 0, schritthoehe, 0],
                          [xHalb, 0, ausgangshoehe, 0], [xHalb, 0, ausgangshoehe, 0]]
         return (listeRechteck)
 
@@ -274,7 +272,7 @@ class Rob:
 
     # Funktion zum Bewegen des Koerpers hoch und runter
     def hochUndRunter(ausgangshoehe, schritthoehe, verschiebungX):
-        listeHochUndRunter = [[0, 0, ausgangshoehe, 1], [0, 0, schritthoehe, 0], [0, 0, ausgangshoehe, 2],
+        listeHochUndRunter = [[0, 0, ausgangshoehe, 1], [0, 0, schritthoehe, 0], [0, 0, ausgangshoehe, 1],
                               [0, 0, schritthoehe, 0]]
         return (listeHochUndRunter)
 
@@ -544,9 +542,11 @@ class Rob:
         while run_event.is_set():
             delta1 = time()
             # START DES TAKTES
+            self.geschwindigkeit()
 
             # Verschiedene Gangarten
-            if self.workList[self.index1][3] == 1 and self.workList[self.index2][3] == 2:
+            #if self.workList[self.index1][3] == 1 and self.workList[self.index2][3] == 2:
+            if self.workList[self.index1][3] == 1:
                 self.dictAbgleich()
                 self.workList = copy.deepcopy(
                         self.listeGangartenfunktionen[self.wahlGangart](self.ausgangshoeheZ, self.hoeheZ,
