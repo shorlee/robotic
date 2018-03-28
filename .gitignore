@@ -60,3 +60,6 @@ target/
 
 # jetbrains
 .idea/
+
+# visual studio
+.vs/
